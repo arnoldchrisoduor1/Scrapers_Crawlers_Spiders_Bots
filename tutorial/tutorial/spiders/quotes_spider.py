@@ -1,3 +1,5 @@
+# scrapping the quotes from the websites.
+
 from pathlib import Path
 
 import scrapy
