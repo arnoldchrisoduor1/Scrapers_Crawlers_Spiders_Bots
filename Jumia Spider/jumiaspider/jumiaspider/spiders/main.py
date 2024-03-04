@@ -11,15 +11,20 @@ class JumiaSpider(scrapy.Spider):
                 "products" : item.css("div.name::text").get(),
                 "price" : item.css("div.prc::text").get(),
             }
-        next_page = response.css("a.pg svg.ic::attr(href)").get()
-        if next_page():
-            yield response.follow(next_page, callback = self.parse_next_page)
 
-    def parse_next_page(self, response):
-        for item in response.css("article.prd"):
+        next_page = response.css('a[aria-label="Next Page"]::attr(href)').get()
+        if next_page is not None:
+            yield response.follow(next_page, callback=self.parse_first_page)
+
+    def parse_first_page(self, response):
+        for item in response.css("article.c-prd"):
             yield {
-                "product" : item.css("div.name::text").get(),
-                "old price": item.css("div.old::text").get(),
-                "new price": item.css("div.prc").get(),
-                "percentage change": item.css("div.bdg::text").get(),
+                "product" : item.css("div.info h3.name::text").get(),
+                "old price" : item.css("span.old::text").get(),
+                "new price" : item.css("span.curr::text").get(),
             }
+            next_page = next_page = response.css('a[aria-label="Next Page"]::attr(href)').get()
+
+        if next_page is not None:
+            yield response.follow(next_page, callback=self.parse_first_page)
+
