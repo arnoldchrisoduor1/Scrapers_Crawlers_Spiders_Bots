@@ -20,8 +20,8 @@ class JumiaSpider(scrapy.Spider):
         for item in response.css("article.c-prd"):
             yield {
                 "product" : item.css("div.info h3.name::text").get(),
-                "old price" : item.css("span.old::text").get(),
-                "new price" : item.css("span.curr::text").get(),
+                "old price" : item.css("div.old::text").get(),
+                "new price" : item.css("div.prc::text").get(),
             }
             next_page = next_page = response.css('a[aria-label="Next Page"]::attr(href)').get()
 
