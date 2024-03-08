@@ -30,6 +30,8 @@ formatter = logging.Formatter('%(asctime)s - %(levelname)s: %(message)s', datefm
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
+flag_file_path = os.path.join(parent_dir, 'scraping_done.flag')
+
 class JumiaSpider(scrapy.Spider):
     name = "jumia"
     allowed_domains = ["jumia.co.ke"]
@@ -85,36 +87,24 @@ class JumiaSpider(scrapy.Spider):
             request.headers['User-Agent'] = user_agent
             yield request
 
-    def spider_closed(self, spider):
+    def closed(self, reason):
         logger.info("Spider Closed")
-        stats = spider.crawler.stats.get_stats()
+        stats = self.crawler.stats.get_stats()
         logger.info(f"Total items scraped: {stats.get('item_scraped_count')}")
         logger.info(f"Start time: {stats.get('start_time')}")
         logger.info(f"Finish time: {stats.get('finish_time')}")
 
-        mailer = MailSender(
-            mail_host=settings.get('MAIL_HOST'),
-            mail_port=settings.get('MAIL_PORT'),
-            mail_user=settings.get('MAIL_USER'),
-            mail_pass=settings.get('MAIL_PASS'),
-            mail_from=settings.get('MAIL_FROM'),
-        )
-        subject = "Jumia Scraping Completed"
-        body = f"Total items scraped: {stats.get('item_scraped_count')}\n"
-        body += f"Start time: {stats.get('start_time')}\n"
-        body += f"Finish time: {stats.get('finish_time')}\n"
-        body += "Scraping logs are attached."
-        mailer.send(
-            to=settings.get('MAIL_TO'),
-            subject=subject,
-            body=body,
-            attachs=[settings.get('LOG_FILE')]
-        )
+        #Creating a flag to indicate the end of the scraping process:-
+        with open(flag_file_path, 'w') as flag_file:
+            flag_file.write('Scraping done.')
 
 # Run the spiders in parallel
-if not twisted.internet.reactor.running:
-    runner = CrawlerRunner(settings)
-    tasks = [runner.crawl(JumiaSpider) for _ in range(4)]
-    reactor.run()
-else:
-    logger.error("Reactor is already running.")
+if __name__ == '__main__':
+    if not twisted.internet.reactor.running:
+        runner = CrawlerRunner(settings)
+        tasks = [runner.crawl(JumiaSpider) for _ in range(4)]
+        deferred_list = twisted.internet.defer.DeferredList(tasks)
+        deferred_list.addBoth(lambda _: reactor.stop())
+        reactor.run()
+    else:
+        logger.error("Reactor is already running.")
