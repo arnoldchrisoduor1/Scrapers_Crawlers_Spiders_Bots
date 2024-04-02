@@ -20,7 +20,7 @@ from scrapy.settings import Settings
 
 # Create and configure the settings object
 settings = Settings()
-settings.setmodule('jumiaspider.settings')
+settings.setmodule('jumiabot.settings')
 
 # Configure logging
 logger = logging.getLogger(__name__)

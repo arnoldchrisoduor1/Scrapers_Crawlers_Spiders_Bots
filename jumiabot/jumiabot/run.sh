@@ -5,7 +5,7 @@ echo "Executing Jumia scraper..."
 scrapy crawl jumia &
 
 # Define the path to the flag file
-flag_file="C:/Users/arnol/OneDrive/Desktop/Data Analysis/Web-Scraping/jumiaspider/jumiaspider/scraping_done.flag"
+flag_file="C:\Users\arnol\Desktop\Scrapers_Crawlers_Spiders_Bots\jumiabot\jumiabot\scraping_done.flag"
 
 # Loop until the flag file is created
 while [ ! -f "$flag_file" ]; do
