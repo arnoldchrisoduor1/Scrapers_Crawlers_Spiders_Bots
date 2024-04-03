@@ -11,7 +11,7 @@ sender_email = "digitalwilderness9@gmail.com"
 recipient_email = "arnoldchris262@gmail.com"
 
 # App-specific password generated from Google Account settings
-app_specific_password = "pzgb rxxp oafh gzmg"
+app_specific_password = ""
 
 # Get the current date in the desired format
 current_date = datetime.datetime.now().strftime('%d %B, %Y')
